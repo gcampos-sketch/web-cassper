@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cómo funciona Cassper</title>
+<style>
+  :root{
+    --ink:#0e1726;
+    --muted:#5b6b82;
+    --line:#dbe3ee;
+    --bg:#f4f7fb;
+    --card:#ffffff;
+    --green:#1faa59;
+    --green-soft:#e6f6ec;
+    --wa:#25d366;
+    --shopify:#95bf47;
+    --helpdesk:#3b82f6;
+    --accent:#ff5a3c;
+    --dot:#ff5a3c;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;}
+  body{
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+    background:
+      radial-gradient(1200px 600px at 50% -10%, #ffffff, transparent),
+      var(--bg);
+    color:var(--ink);
+    min-height:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:40px 20px 80px;
+  }
+  header{text-align:center;max-width:720px;margin-bottom:30px;}
+  .kicker{
+    font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--accent);font-weight:700;margin-bottom:10px;
+  }
+  h1{
+    font-size:clamp(25px,4.2vw,38px);
+    line-height:1.1;font-weight:800;letter-spacing:-.02em;
+  }
+  h1 .hl{color:var(--green);}
+  p.sub{margin-top:12px;color:var(--muted);font-size:16px;line-height:1.5;}
+
+  /* ---------- SETUP STRIP: the helpdesk pre-condition ---------- */
+  .setup{
+    width:100%;max-width:980px;
+    background:#eef3fb;
+    border:1px dashed #c2d2ea;
+    border-radius:18px;
+    padding:16px 20px;
+    margin-bottom:18px;
+    display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;
+  }
+  .setup .lbl{font-size:12.5px;font-weight:800;letter-spacing:.04em;color:var(--helpdesk);text-transform:uppercase;}
+  .chip{
+    display:inline-flex;align-items:center;gap:7px;
+    background:#fff;border:1px solid var(--line);border-radius:99px;
+    padding:7px 13px;font-size:13.5px;font-weight:700;
+  }
+  .chip .e{font-size:17px;}
+  .plus,.eq{color:var(--muted);font-weight:800;font-size:15px;}
+  .chip.helpdesk{border-color:var(--helpdesk);color:var(--helpdesk);}
+
+  .stage{
+    position:relative;
+    width:100%;
+    max-width:980px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:24px;
+    padding:46px 30px 40px;
+    box-shadow:0 24px 60px -34px rgba(14,23,38,.35);
+  }
+
+  .track{
+    position:relative;
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    align-items:start;
+  }
+  .step{
+    position:relative;
+    display:flex;flex-direction:column;align-items:center;text-align:center;
+    padding:0 8px;z-index:2;
+  }
+  .rail{
+    position:absolute;top:46px;left:12.5%;right:12.5%;height:4px;
+    background:var(--line);border-radius:99px;z-index:1;
+  }
+  .rail-fill{
+    position:absolute;inset:0;width:0%;
+    background:linear-gradient(90deg,var(--helpdesk),var(--accent),var(--accent),var(--green));
+    border-radius:99px;transition:width .25s linear;
+  }
+
+  .node{
+    width:92px;height:92px;border-radius:22px;
+    background:#fff;border:2px solid var(--line);
+    display:flex;align-items:center;justify-content:center;position:relative;
+    transition:transform .3s ease,border-color .3s ease,box-shadow .3s ease,background .3s ease;
+  }
+  .node .emoji{font-size:38px;line-height:1;}
+  .node.stack{flex-direction:column;gap:3px;}
+  .node.stack .row{display:flex;gap:5px;font-size:24px;}
+  .node.stack .cap{font-size:9px;font-weight:800;letter-spacing:.06em;color:var(--helpdesk);text-transform:uppercase;}
+
+  .step.active .node{
+    transform:translateY(-6px) scale(1.06);
+    border-color:var(--accent);
+    box-shadow:0 16px 34px -16px rgba(255,90,60,.6);
+  }
+  .step.done .node{border-color:var(--green);}
+
+  .badge{margin-top:14px;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
+  .title{margin-top:6px;font-size:16.5px;font-weight:800;}
+  .desc{margin-top:6px;font-size:13.5px;color:var(--muted);line-height:1.45;max-width:205px;}
+
+  .dot{
+    position:absolute;top:46px;left:0;
+    width:22px;height:22px;border-radius:50%;background:var(--dot);
+    transform:translate(-50%,-50%);
+    box-shadow:0 0 0 6px rgba(255,90,60,.18), 0 6px 14px rgba(255,90,60,.5);
+    z-index:5;opacity:0;transition:opacity .3s ease;
+  }
+  .dot.show{opacity:1;}
+
+  .step.recovered .node{
+    background:var(--green-soft);border-color:var(--green);
+    box-shadow:0 16px 34px -16px rgba(31,170,89,.6);
+  }
+  .recovered-tag{
+    margin-top:12px;display:inline-flex;align-items:center;gap:6px;
+    background:var(--green);color:#fff;font-size:12px;font-weight:800;
+    padding:6px 12px;border-radius:99px;
+    opacity:0;transform:translateY(6px);
+    transition:opacity .4s ease,transform .4s ease;
+  }
+  .step.recovered .recovered-tag{opacity:1;transform:translateY(0);}
+
+  .controls{margin-top:34px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+  button{
+    font:inherit;font-weight:700;font-size:15px;border:none;cursor:pointer;
+    border-radius:99px;padding:13px 26px;transition:transform .15s ease,opacity .15s ease;
+  }
+  button:active{transform:scale(.96);}
+  .btn-play{background:var(--accent);color:#fff;}
+  .btn-reset{background:#fff;color:var(--ink);border:1.5px solid var(--line);}
+
+  .caption{margin-top:22px;text-align:center;color:var(--muted);font-size:14.5px;min-height:24px;font-weight:600;line-height:1.5;}
+  .caption b{color:var(--ink);}
+
+  /* ---------- HEATMAP ---------- */
+  .heat{
+    width:100%;max-width:980px;margin-top:40px;
+    background:var(--card);border:1px solid var(--line);border-radius:24px;
+    padding:34px 30px 36px;
+    box-shadow:0 24px 60px -34px rgba(14,23,38,.35);
+  }
+  .heat .kicker{text-align:center;}
+  .heat h2{
+    text-align:center;font-size:clamp(20px,3vw,26px);font-weight:800;
+    letter-spacing:-.01em;margin-bottom:6px;
+  }
+  .heat .sub{text-align:center;color:var(--muted);font-size:15px;line-height:1.5;max-width:620px;margin:0 auto 16px;}
+
+  .ai-pill{
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    width:fit-content;margin:0 auto 24px;
+    background:linear-gradient(90deg,#eef3fb,#f3eefb);
+    border:1px solid #d8d0f0;
+    color:#6d4ad1;font-size:12.5px;font-weight:800;letter-spacing:.03em;
+    padding:8px 16px;border-radius:99px;
+  }
+
+  /* AI reads a chat snippet and infers the category */
+  .ai-demo{
+    display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:14px;
+    background:#f8fafd;border:1px solid var(--line);border-radius:16px;
+    padding:16px 18px;margin-bottom:26px;
+  }
+  .chatbox{display:flex;flex-direction:column;gap:7px;min-height:118px;justify-content:flex-end;}
+  .bubble{
+    font-size:13px;line-height:1.4;padding:9px 12px;border-radius:14px;max-width:90%;
+    opacity:0;transform:translateY(8px) scale(.96);
+    transition:opacity .35s ease, transform .35s cubic-bezier(.2,.8,.3,1.2);
+  }
+  .bubble.show{opacity:1;transform:translateY(0) scale(1);}
+  .bubble.them{background:#fff;border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px;}
+  .bubble.me{background:#dcf8c6;align-self:flex-end;border-bottom-right-radius:4px;}
+  /* typing indicator */
+  .typing{display:inline-flex;gap:4px;align-items:center;padding:11px 14px;}
+  .typing i{width:6px;height:6px;border-radius:50%;background:#b8c2d2;animation:blink 1.1s infinite;}
+  .typing i:nth-child(2){animation-delay:.18s;}
+  .typing i:nth-child(3){animation-delay:.36s;}
+  @keyframes blink{0%,60%,100%{opacity:.25;transform:translateY(0);}30%{opacity:1;transform:translateY(-2px);}}
+
+  .ai-arrow{display:flex;flex-direction:column;align-items:center;gap:4px;color:#6d4ad1;font-weight:800;font-size:11px;}
+  .ai-arrow .ar{font-size:22px;}
+  .ai-arrow.thinking .ar{animation:spin 1.1s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .ai-out{display:flex;flex-direction:column;gap:8px;min-height:74px;justify-content:center;}
+  .ai-out .lead{font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);}
+  .ai-tag{
+    display:inline-flex;align-items:center;gap:7px;width:fit-content;
+    background:#fff;border:1.5px solid var(--accent);color:var(--accent);
+    font-size:13px;font-weight:800;padding:7px 13px;border-radius:99px;
+    opacity:0;transform:translateY(6px) scale(.95);
+    transition:opacity .4s ease, transform .4s cubic-bezier(.2,.8,.3,1.3);
+  }
+  .ai-tag.show{opacity:1;transform:translateY(0) scale(1);}
+  .ai-tag.green{border-color:var(--green);color:var(--green);}
+  @media (max-width:680px){.ai-demo{grid-template-columns:1fr;}.ai-arrow .ar{transform:rotate(90deg);}.ai-arrow.thinking .ar{animation:none;}}
+
+
+  /* ---------- ORBIT ---------- */
+  .orbit{
+    position:relative;
+    width:min(560px,92vw);
+    height:min(560px,92vw);
+    margin:8px auto 30px;
+  }
+  /* heat bands: filled radial gradient from hot core to cool edge */
+  .orbit::after{
+    content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    width:99%;height:99%;border-radius:50%;z-index:0;
+    background:radial-gradient(circle,
+      rgba(255,45,32,.42) 0%,
+      rgba(255,45,32,.40) 19%,
+      rgba(255,106,44,.30) 30%,
+      rgba(255,159,28,.20) 40%,
+      rgba(255,194,75,.12) 50%,
+      rgba(255,217,102,.05) 70%,
+      rgba(255,217,102,0) 99%);
+  }
+  .ring{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    border-radius:50%;border:1.5px solid rgba(255,255,255,.55);
+    z-index:1;
+  }
+  /* radii as % of orbit box */
+  .ring.r1{width:38%;height:38%;}
+  .ring.r2{width:60%;height:60%;}
+  .ring.r3{width:80%;height:80%;}
+  .ring.r4{width:99%;height:99%;border-color:rgba(255,194,75,.5);}
+
+  /* probability labels sitting on the bands (top axis) */
+  .prob-axis{position:absolute;top:0;left:50%;transform:translateX(-50%);height:100%;width:1px;z-index:2;pointer-events:none;}
+  .prob-mark{
+    position:absolute;left:50%;transform:translateX(-50%);
+    font-size:9.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;
+    color:#9a3b28;white-space:nowrap;background:rgba(255,255,255,.7);
+    padding:1px 6px;border-radius:99px;
+  }
+
+  /* heat haze in the center */
+  .orbit::before{
+    content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    width:30%;height:30%;border-radius:50%;
+    background:radial-gradient(circle, rgba(255,45,32,.35), transparent 70%);
+    z-index:0;
+  }
+
+  .core{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    width:118px;height:118px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #ff7a3c, #ff2d20);
+    color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+    text-align:center;z-index:4;
+    box-shadow:0 0 0 8px rgba(255,45,32,.12), 0 18px 40px -14px rgba(255,45,32,.7);
+    animation:pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse{
+    0%,100%{box-shadow:0 0 0 8px rgba(255,45,32,.12), 0 18px 40px -14px rgba(255,45,32,.7);}
+    50%{box-shadow:0 0 0 16px rgba(255,45,32,.05), 0 18px 40px -14px rgba(255,45,32,.7);}
+  }
+  .core-ic{font-size:30px;line-height:1;}
+  .core-t{font-size:12.5px;font-weight:800;line-height:1.2;}
+
+  .planet{
+    position:absolute;top:50%;left:50%;
+    transform:translate(-50%,-50%);
+    display:flex;flex-direction:column;align-items:center;gap:7px;
+    z-index:3;
+    opacity:0;
+    transition:opacity .6s ease, top .9s cubic-bezier(.2,.7,.2,1), left .9s cubic-bezier(.2,.7,.2,1);
+  }
+  .orbit.in .planet{opacity:1;}
+  .dot-node{
+    width:60px;height:60px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;font-size:26px;
+    background:#fff;border:2.5px solid var(--line);
+    box-shadow:0 8px 20px -8px rgba(14,23,38,.35);
+  }
+  .dot-node.hot1{border-color:#ff2d20;box-shadow:0 0 0 5px rgba(255,45,32,.14),0 8px 20px -8px rgba(255,45,32,.5);}
+  .dot-node.hot2{border-color:#ff6a2c;box-shadow:0 0 0 5px rgba(255,106,44,.12),0 8px 20px -8px rgba(255,106,44,.45);}
+  .dot-node.hot3{border-color:#ff9f1c;}
+  .dot-node.hot4{border-color:#ffc24b;}
+  .p-label{
+    background:#fff;border:1px solid var(--line);border-radius:12px;
+    padding:6px 10px;text-align:center;box-shadow:0 6px 16px -10px rgba(14,23,38,.3);
+    white-space:nowrap;
+  }
+  .p-label b{display:block;font-size:12.5px;}
+  .p-label span{display:block;font-size:10.5px;color:var(--muted);font-weight:700;margin-top:1px;}
+
+  .orbit-legend{
+    display:flex;flex-direction:column;gap:8px;align-items:flex-start;
+    max-width:560px;margin:0 auto;
+  }
+  .orbit-legend .lg{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--muted);font-weight:600;}
+  .orbit-legend .sw{width:14px;height:14px;border-radius:50%;flex:none;}
+  .sw.hot1{background:linear-gradient(135deg,#ff7a3c,#ff2d20);}
+  .sw.others{background:#cdd6e3;}
+  .sw.cassper{background:var(--green);}
+
+  @media (max-width:560px){
+    .dot-node{width:46px;height:46px;font-size:20px;}
+    .p-label{padding:4px 7px;}
+    .p-label b{font-size:11px;}
+    .p-label span{font-size:9.5px;}
+    .core{width:92px;height:92px;}
+    .core-t{font-size:11px;}
+  }
+
+  @media (max-width:680px){
+    .stage{padding:34px 14px 30px;}
+    .track{grid-template-columns:repeat(2,1fr);row-gap:36px;}
+    .rail,.dot{display:none;}
+    .desc{max-width:none;}
+    .setup{flex-direction:column;gap:8px;}
+    .heat{padding:28px 16px 30px;}
+  }
+
+</style>
+</head>
+<body>
+  <header>
+    <div class="kicker">Cómo funciona Cassper</div>
+    <h1>Las ventas perdidas viven <span class="hl">dentro de la conversación</span></h1>
+    <p class="sub">Cassper no busca un WhatsApp suelto: se conecta a tu mesa de ayuda para leer los chats y rescatar la venta que se perdió. Va más allá del carrito abandonado.</p>
+  </header>
+
+  <!-- Pre-condición: la mesa de ayuda -->
+  <div class="setup">
+    <span class="lbl">Lo que ya tienes →</span>
+    <span class="chip helpdesk"><span class="e">🎧</span> Mesa de ayuda</span>
+    <span class="eq">conecta</span>
+    <span class="chip"><span class="e">💬</span> WhatsApp</span>
+    <span class="plus">+</span>
+    <span class="chip"><span class="e">🛒</span> Shopify / ecommerce</span>
+    <span class="eq">→</span>
+    <span class="chip" style="border-color:var(--accent);color:var(--accent);"><span class="e">🧠</span> Cassper se monta encima</span>
+  </div>
+
+  <div class="stage">
+    <div class="track" id="track">
+      <div class="rail"><div class="rail-fill" id="railFill"></div></div>
+      <div class="dot" id="dot"></div>
+
+      <div class="step" data-step="0">
+        <div class="node stack">
+          <div class="cap">Mesa de ayuda</div>
+          <div class="row"><span>💬</span><span>🛒</span></div>
+        </div>
+        <div class="badge">01 · Fuente</div>
+        <div class="title">Conversaciones reales</div>
+        <div class="desc">Cassper se integra a tu mesa de ayuda (con WhatsApp + ecommerce) y lee los chats.</div>
+      </div>
+
+      <div class="step" data-step="1">
+        <div class="node"><span class="emoji">🔎</span></div>
+        <div class="badge">02 · Diagnóstico</div>
+        <div class="title">Venta perdida en el chat</div>
+        <div class="desc">Encuentra la intención de compra que no cerró y por qué. Más allá del carrito abandonado.</div>
+      </div>
+
+      <div class="step" data-step="2">
+        <div class="node"><span class="emoji">📝</span></div>
+        <div class="badge">03 · Acción</div>
+        <div class="title">Plantilla de WhatsApp</div>
+        <div class="desc">Arma un mensaje personalizado según el motivo exacto de la caída.</div>
+      </div>
+
+      <div class="step" data-step="3">
+        <div class="node"><span class="emoji">🙋</span></div>
+        <div class="badge">04 · Cliente</div>
+        <div class="title">Cliente final</div>
+        <div class="desc">Recibe el mensaje por la misma mesa de ayuda y vuelve a comprar.</div>
+        <div class="recovered-tag">✓ Conversión recuperada</div>
+      </div>
+    </div>
+
+    <div class="caption" id="caption">Presiona <b>Reproducir</b> para ver el flujo.</div>
+
+    <div class="controls">
+      <button class="btn-play" id="playBtn">▶ Reproducir</button>
+      <button class="btn-reset" id="resetBtn">↺ Reiniciar</button>
+    </div>
+  </div>
+
+  <!-- ---------- ZONA DE CALOR ---------- -->
+  <div class="heat">
+    <div class="kicker">Zona de calor · Motivos de pérdida</div>
+    <h2>No todas las ventas perdidas son iguales de "calientes"</h2>
+    <p class="sub">Estas categorías no se configuran a mano: <b>la IA de Cassper las descubre leyendo lo que dicen las conversaciones</b>. Mientras más caliente el motivo, mayor probabilidad de reconvertir. El carrito abandonado ya lo trabajan otras apps; Cassper va a buscar todo lo que viene después.</p>
+
+    <div class="ai-pill">🤖 Detectado por IA a partir de las conversaciones</div>
+
+    <div class="ai-demo">
+      <div class="chatbox" id="chatbox"></div>
+      <div class="ai-arrow" id="aiArrow">
+        <span class="ar">→</span>
+        <span id="aiArrowLbl">IA lee</span>
+      </div>
+      <div class="ai-out" id="aiOut">
+        <span class="lead">Cassper infiere</span>
+      </div>
+    </div>
+
+    <div class="orbit" id="orbit">
+      <!-- concentric rings -->
+      <div class="ring r1"></div>
+      <div class="ring r2"></div>
+      <div class="ring r3"></div>
+      <div class="ring r4"></div>
+
+      <!-- probability marks along the top axis -->
+      <div class="prob-axis">
+        <span class="prob-mark" style="top:42%;">+prob.</span>
+        <span class="prob-mark" style="top:30%;">alta</span>
+        <span class="prob-mark" style="top:19%;">media</span>
+        <span class="prob-mark" style="top:7%;">−prob.</span>
+      </div>
+
+      <!-- center = conversion -->
+      <div class="core">
+        <span class="core-ic">🎯</span>
+        <span class="core-t">Conversión<br>recuperada</span>
+      </div>
+
+      <!-- planets: closer = hotter -->
+      <div class="planet p1" data-ring="r1" data-ang="-40">
+        <div class="dot-node hot1">🛒</div>
+        <div class="p-label"><b>Carrito abandonado</b><span>muy caliente · otras apps</span></div>
+      </div>
+      <div class="planet p2" data-ring="r2" data-ang="55">
+        <div class="dot-node hot2">📦</div>
+        <div class="p-label"><b>Falta de stock</b><span>caliente · Cassper</span></div>
+      </div>
+      <div class="planet p3" data-ring="r3" data-ang="160">
+        <div class="dot-node hot3">👻</div>
+        <div class="p-label"><b>Ghosting / sin follow-up</b><span>tibio · Cassper</span></div>
+      </div>
+      <div class="planet p4" data-ring="r4" data-ang="235">
+        <div class="dot-node hot4">❓</div>
+        <div class="p-label"><b>Consultas mal respondidas</b><span>templado · Cassper</span></div>
+      </div>
+    </div>
+
+    <div class="orbit-legend">
+      <span class="lg"><i class="sw hot1"></i> Más cerca del centro = más caliente y más probable de reconvertir</span>
+      <span class="lg"><i class="sw others"></i> 🛒 Carrito abandonado ya lo hacen otras apps</span>
+      <span class="lg"><i class="sw cassper"></i> 🧠 Cassper rescata todo lo que orbita más afuera, leyendo la conversación</span>
+    </div>
+  </div>
+
+<script>
+  const steps = Array.from(document.querySelectorAll('.step'));
+  const dot = document.getElementById('dot');
+  const railFill = document.getElementById('railFill');
+  const caption = document.getElementById('caption');
+  const playBtn = document.getElementById('playBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const track = document.getElementById('track');
+
+  const captions = [
+    'Tu <b>mesa de ayuda</b> ya tiene WhatsApp y el ecommerce conectados. Cassper se monta encima y lee las conversaciones.',
+    'Dentro del chat, Cassper detecta una <b>venta perdida</b> con intención real… algo que el carrito abandonado nunca vería.',
+    'Genera una <b>plantilla de WhatsApp</b> según el porqué exacto de la caída.',
+    'El cliente responde y vuelve a comprar. <b>✓ Venta recuperada.</b>'
+  ];
+
+  let playing = false;
+  let timers = [];
+
+  function clearAll(){
+    timers.forEach(t=>clearTimeout(t));
+    timers = [];
+    steps.forEach(s=>s.classList.remove('active','done','recovered'));
+    dot.classList.remove('show');
+    railFill.style.width = '0%';
+    railFill.style.transition = 'width .25s linear';
+  }
+
+  function nodeCenter(step){
+    const node = step.querySelector('.node');
+    const tRect = track.getBoundingClientRect();
+    const nRect = node.getBoundingClientRect();
+    return (nRect.left + nRect.width/2) - tRect.left;
+  }
+
+  function moveDotTo(step, dur){
+    const x = nodeCenter(step);
+    dot.style.transition = `left ${dur}ms cubic-bezier(.45,.05,.35,1)`;
+    dot.style.left = x + 'px';
+  }
+
+  function play(){
+    if(playing) return;
+    clearAll();
+    playing = true;
+    playBtn.textContent = '▶ Reproduciendo…';
+    playBtn.disabled = true;
+
+    const startX = nodeCenter(steps[0]);
+    dot.style.transition = 'none';
+    dot.style.left = startX + 'px';
+    void dot.offsetWidth;
+    dot.classList.add('show');
+
+    const stepTime = 1900;
+
+    steps.forEach((step, i)=>{
+      timers.push(setTimeout(()=>{
+        steps.forEach(s=>s.classList.remove('active'));
+        step.classList.add('active');
+        if(i>0) steps[i-1].classList.add('done');
+
+        moveDotTo(step, 720);
+        railFill.style.width = ( (i/(steps.length-1)) * 100 ) + '%';
+        caption.innerHTML = captions[i];
+
+        if(i === steps.length-1){
+          timers.push(setTimeout(()=>{
+            step.classList.add('done','recovered');
+            dot.style.transition = 'opacity .4s ease';
+            dot.classList.remove('show');
+          }, 850));
+          timers.push(setTimeout(()=>{
+            playing = false;
+            playBtn.textContent = '▶ Reproducir';
+            playBtn.disabled = false;
+          }, 1700));
+        }
+      }, i*stepTime));
+    });
+  }
+
+  function reset(){
+    clearAll();
+    playing = false;
+    playBtn.textContent = '▶ Reproducir';
+    playBtn.disabled = false;
+    caption.innerHTML = 'Presiona <b>Reproducir</b> para ver el flujo.';
+  }
+
+  playBtn.addEventListener('click', play);
+  resetBtn.addEventListener('click', reset);
+
+  window.addEventListener('resize', ()=>{
+    const active = document.querySelector('.step.active');
+    if(active && dot.classList.contains('show')){
+      const x = nodeCenter(active);
+      dot.style.transition = 'none';
+      dot.style.left = x + 'px';
+    }
+  });
+
+  // ---------- ORBIT positioning ----------
+  const orbit = document.getElementById('orbit');
+  const planets = Array.from(document.querySelectorAll('.planet'));
+  // ring radius as fraction of half-size (matches ring widths /2)
+  const ringR = { r1:0.19, r2:0.30, r3:0.40, r4:0.495 };
+
+  // base angle (deg) + very slow per-planet angular speed (deg per second)
+  const planetState = planets.map(p=>({
+    el:p,
+    ring:p.dataset.ring,
+    ang: parseFloat(p.dataset.ang),
+    speed: 1.1   // ~1.1°/s → one full loop in ~5.5 minutes (muuuuuy lento)
+  }));
+
+  let spinning = false;
+  let lastT = null;
+
+  function renderOrbit(){
+    const size = orbit.clientWidth;
+    const half = size/2;
+    planetState.forEach(s=>{
+      const r = ringR[s.ring] * size;
+      const a = s.ang * Math.PI/180;
+      const x = half + r*Math.cos(a);
+      const y = half + r*Math.sin(a);
+      s.el.style.left = x + 'px';
+      s.el.style.top  = y + 'px';
+    });
+  }
+
+  function tick(t){
+    if(!spinning) return;
+    if(lastT == null) lastT = t;
+    const dt = (t - lastT)/1000;
+    lastT = t;
+    planetState.forEach(s=> s.ang += s.speed * dt);
+    renderOrbit();
+    requestAnimationFrame(tick);
+  }
+
+  function collapsePlanets(){
+    const half = orbit.clientWidth/2;
+    planets.forEach(p=>{ p.style.left = half+'px'; p.style.top = half+'px'; });
+  }
+
+  // start collapsed at center, then fly out + begin slow spin when scrolled into view
+  collapsePlanets();
+  const orbitObs = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        orbit.classList.add('in');
+        // stagger outward to each ring
+        planetState.forEach((s,i)=> setTimeout(()=>{
+          const size = orbit.clientWidth, half=size/2;
+          const r = ringR[s.ring]*size;
+          const a = s.ang*Math.PI/180;
+          s.el.style.left = (half + r*Math.cos(a))+'px';
+          s.el.style.top  = (half + r*Math.sin(a))+'px';
+        }, 200 + i*220));
+        // once they've arrived, switch to continuous slow orbit
+        setTimeout(()=>{
+          // kill the per-property transitions so the rAF loop is smooth
+          planets.forEach(p=> p.style.transition = 'opacity .6s ease');
+          spinning = true;
+          lastT = null;
+          requestAnimationFrame(tick);
+        }, 200 + planetState.length*220 + 950);
+        orbitObs.disconnect();
+      }
+    });
+  }, {threshold:.3});
+  orbitObs.observe(orbit);
+
+  window.addEventListener('resize', ()=>{ if(orbit.classList.contains('in')) renderOrbit(); });
+
+
+  // ---------- LOOPING AI CHAT DEMO (autoplay, GIF-style) ----------
+  const chatbox = document.getElementById('chatbox');
+  const aiOut = document.getElementById('aiOut');
+  const aiArrow = document.getElementById('aiArrow');
+  const aiArrowLbl = document.getElementById('aiArrowLbl');
+
+  const cases = [
+    {
+      chat:[
+        {who:'them', t:'Hola, ¿les llega el horno de 80L? Lo necesito esta semana 🙏'},
+        {who:'me',   t:'Hola! Déjame revisar stock y te confirmo…'},
+        {who:'them', t:'Ya pasaron 3 días, ¿hay novedad? 😕'}
+      ],
+      tags:[
+        {cls:'green', t:'📦 Falta de stock + 👻 ghosting'},
+        {cls:'',      t:'💰 Venta perdida: $399.990'}
+      ]
+    },
+    {
+      chat:[
+        {who:'them', t:'¿La lavadora viene con instalación incluida?'},
+        {who:'me',   t:'Sí, déjame cotizarte el despacho…'},
+        {who:'them', t:'Ok, lo voy a pensar 🤔'}
+      ],
+      tags:[
+        {cls:'green', t:'❓ Duda no resuelta + 🕐 indecisión'},
+        {cls:'',      t:'💰 Venta perdida: $329.990'}
+      ]
+    },
+    {
+      chat:[
+        {who:'them', t:'Vi este refri en otra tienda más barato 👀'},
+        {who:'me',   t:'¿Cuál viste? Podemos revisarlo'},
+        {who:'them', t:'…'}
+      ],
+      tags:[
+        {cls:'green', t:'⚔️ Compite por precio + 👻 ghosting'},
+        {cls:'',      t:'💰 Venta perdida: $629.990'}
+      ]
+    },
+    {
+      chat:[
+        {who:'them', t:'Quiero la cocina a gas de 4 quemadores'},
+        {who:'me',   t:'¡Perfecto! Te paso el link de pago'},
+        {who:'them', t:'Gracias, después lo hago 🙌'}
+      ],
+      tags:[
+        {cls:'green', t:'🛒 Checkout no completado + 👻 ghosting'},
+        {cls:'',      t:'💰 Venta perdida: $449.990'}
+      ]
+    }
+  ];
+
+  const sleep = (ms)=> new Promise(r=> setTimeout(r, ms));
+  let demoRunning = false;
+
+  function resetDemo(){
+    chatbox.innerHTML = '';
+    aiOut.innerHTML = '<span class="lead">Cassper infiere</span>';
+    aiArrow.classList.remove('thinking');
+    aiArrowLbl.textContent = 'IA lee';
+  }
+
+  async function runCase(c){
+    resetDemo();
+    // bubbles appear one by one (with a typing indicator before "them" lines)
+    for(const m of c.chat){
+      const typing = document.createElement('div');
+      typing.className = 'bubble ' + m.who + ' show typing';
+      typing.innerHTML = '<i></i><i></i><i></i>';
+      chatbox.appendChild(typing);
+      await sleep(620);
+      typing.remove();
+
+      const b = document.createElement('div');
+      b.className = 'bubble ' + m.who;
+      b.textContent = m.t;
+      chatbox.appendChild(b);
+      void b.offsetWidth;
+      b.classList.add('show');
+      await sleep(720);
+    }
+
+    // AI "thinks"
+    aiArrow.classList.add('thinking');
+    aiArrowLbl.textContent = 'analizando…';
+    await sleep(900);
+    aiArrow.classList.remove('thinking');
+    aiArrowLbl.textContent = 'IA lee';
+
+    // tags pop in
+    for(const tag of c.tags){
+      const el = document.createElement('span');
+      el.className = 'ai-tag ' + tag.cls;
+      el.textContent = tag.t;
+      aiOut.appendChild(el);
+      void el.offsetWidth;
+      el.classList.add('show');
+      await sleep(420);
+    }
+
+    await sleep(2400); // hold so it's readable
+  }
+
+  async function loopDemo(){
+    if(demoRunning) return;
+    demoRunning = true;
+    let i = 0;
+    while(true){
+      await runCase(cases[i % cases.length]);
+      i++;
+    }
+  }
+
+  // autoplay once the demo scrolls into view
+  const demoObs = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ loopDemo(); demoObs.disconnect(); } });
+  }, {threshold:.3});
+  demoObs.observe(chatbox);
+
+</script>
+</body>
+</html>
