@@ -76,6 +76,34 @@
     box-shadow:0 24px 60px -34px rgba(14,23,38,.35);
   }
 
+  /* ---- compact connection + flow ---- */
+  .stage.compact{padding:24px 26px;}
+  .conn{
+    display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;
+    padding-bottom:18px;margin-bottom:18px;border-bottom:1px solid var(--line);
+  }
+  .conn .chip{
+    display:inline-flex;align-items:center;gap:7px;
+    background:#f6f9fd;border:1px solid var(--line);border-radius:99px;
+    padding:7px 13px;font-size:13.5px;font-weight:700;
+  }
+  .conn .chip .e{font-size:16px;}
+  .conn .chip.accent{border-color:var(--accent);color:var(--accent);background:#fff4f1;}
+  .conn .dotsep{color:var(--muted);font-weight:800;}
+  .conn .conn-arrow{color:var(--accent);font-weight:800;font-size:17px;margin:0 2px;}
+
+  .miniflow{
+    display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;
+  }
+  .ms{
+    display:flex;align-items:center;gap:9px;
+    background:#fff;border:1.5px solid var(--line);border-radius:14px;
+    padding:11px 15px;font-size:14px;font-weight:700;
+  }
+  .ms-ic{font-size:20px;}
+  .ms-arrow{color:var(--muted);font-weight:800;font-size:16px;}
+  .ms-win{border-color:var(--green);color:var(--green);background:var(--green-soft);}
+
   .track{
     position:relative;
     display:grid;
@@ -178,7 +206,7 @@
 
   /* AI reads a chat snippet and infers the category */
   .ai-demo{
-    display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:14px;
+    display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:12px;
     background:#f8fafd;border:1px solid var(--line);border-radius:16px;
     padding:16px 18px;margin-bottom:26px;
   }
@@ -213,39 +241,78 @@
   }
   .ai-tag.show{opacity:1;transform:translateY(0) scale(1);}
   .ai-tag.green{border-color:var(--green);color:var(--green);}
-  @media (max-width:680px){.ai-demo{grid-template-columns:1fr;}.ai-arrow .ar{transform:rotate(90deg);}.ai-arrow.thinking .ar{animation:none;}}
+
+  /* HSM WhatsApp template send */
+  .hsm-col{display:flex;flex-direction:column;gap:6px;min-height:118px;justify-content:center;}
+  .hsm-col .lead{font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);}
+  .hsm-phone{
+    background:#e7f8ea;border:1px solid #bfe8c8;border-radius:14px;
+    padding:9px 10px 11px;position:relative;
+    opacity:0;transform:translateY(8px) scale(.96);
+    transition:opacity .45s ease, transform .45s cubic-bezier(.2,.8,.3,1.25);
+  }
+  .hsm-phone.show{opacity:1;transform:translateY(0) scale(1);}
+  .hsm-head{display:flex;align-items:center;gap:6px;margin-bottom:7px;}
+  .hsm-head .wa{font-size:14px;}
+  .hsm-head .biz{font-size:11px;font-weight:800;color:#075e54;}
+  .hsm-head .tpl{margin-left:auto;font-size:8.5px;font-weight:800;letter-spacing:.04em;color:#1a7f3c;background:#cdeed4;padding:2px 6px;border-radius:99px;}
+  .hsm-msg{
+    background:#fff;border-radius:10px;border-top-left-radius:3px;
+    padding:9px 11px;font-size:12px;line-height:1.45;color:#0e1726;
+    box-shadow:0 2px 6px -3px rgba(0,0,0,.2);
+  }
+  .hsm-msg .var{background:#fff2c2;border-radius:4px;padding:0 3px;font-weight:700;}
+  .hsm-cta{
+    margin-top:6px;display:flex;align-items:center;justify-content:center;gap:6px;
+    background:#fff;border-radius:8px;padding:7px;font-size:11.5px;font-weight:800;color:#0a7cff;
+    box-shadow:0 2px 6px -3px rgba(0,0,0,.2);
+  }
+  .hsm-status{
+    display:flex;align-items:center;gap:5px;margin-top:7px;
+    font-size:10.5px;font-weight:800;color:#1a7f3c;
+    opacity:0;transition:opacity .4s ease;
+  }
+  .hsm-status.show{opacity:1;}
+
+  @media (max-width:680px){
+    .ai-demo{grid-template-columns:1fr;}
+    .ai-arrow .ar{transform:rotate(90deg);}
+    .ai-arrow.thinking .ar{animation:none;transform:rotate(90deg);}
+    .hsm-col,.ai-out,.chatbox{min-height:0;}
+  }
 
 
   /* ---------- ORBIT ---------- */
   .orbit{
     position:relative;
-    width:min(560px,92vw);
-    height:min(560px,92vw);
-    margin:8px auto 30px;
+    width:min(520px,90vw);
+    aspect-ratio:1 / 1;
+    height:auto;
+    margin:20px auto 40px;
   }
   /* heat bands: filled radial gradient from hot core to cool edge */
   .orbit::after{
     content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-    width:99%;height:99%;border-radius:50%;z-index:0;
+    width:90%;height:90%;border-radius:50%;z-index:0;
     background:radial-gradient(circle,
       rgba(255,45,32,.42) 0%,
       rgba(255,45,32,.40) 19%,
-      rgba(255,106,44,.30) 30%,
-      rgba(255,159,28,.20) 40%,
-      rgba(255,194,75,.12) 50%,
-      rgba(255,217,102,.05) 70%,
-      rgba(255,217,102,0) 99%);
+      rgba(255,106,44,.30) 32%,
+      rgba(255,159,28,.20) 45%,
+      rgba(255,194,75,.12) 60%,
+      rgba(255,217,102,.05) 80%,
+      rgba(255,217,102,0) 100%);
   }
   .ring{
     position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-    border-radius:50%;border:1.5px solid rgba(255,255,255,.55);
+    border-radius:50%;border:2px dashed rgba(180,60,40,.45);
     z-index:1;
   }
   /* radii as % of orbit box */
-  .ring.r1{width:38%;height:38%;}
-  .ring.r2{width:60%;height:60%;}
-  .ring.r3{width:80%;height:80%;}
-  .ring.r4{width:99%;height:99%;border-color:rgba(255,194,75,.5);}
+  .ring.r1{width:38%;height:38%;border-color:rgba(220,40,30,.55);}
+  .ring.r2{width:57%;height:57%;border-color:rgba(210,90,40,.45);}
+  .ring.r3{width:75%;height:75%;border-color:rgba(190,120,50,.4);}
+  .ring.r4{width:90%;height:90%;border-color:rgba(180,140,60,.38);}
 
   /* probability labels sitting on the bands (top axis) */
   .prob-axis{position:absolute;top:0;left:50%;transform:translateX(-50%);height:100%;width:1px;z-index:2;pointer-events:none;}
@@ -282,13 +349,16 @@
 
   .planet{
     position:absolute;top:50%;left:50%;
-    transform:translate(-50%,-50%);
     display:flex;flex-direction:column;align-items:center;gap:7px;
     z-index:3;
     opacity:0;
-    transition:opacity .6s ease, top .9s cubic-bezier(.2,.7,.2,1), left .9s cubic-bezier(.2,.7,.2,1);
+    transform:translate(-50%,-50%) scale(.6);
+    transition:opacity .6s ease, transform .6s cubic-bezier(.2,.8,.3,1.3);
   }
-  .orbit.in .planet{opacity:1;}
+  .orbit.in .planet{opacity:1;transform:translate(-50%,-50%) scale(1);}
+  .orbit.in .planet.p2{transition-delay:.12s;}
+  .orbit.in .planet.p3{transition-delay:.24s;}
+  .orbit.in .planet.p4{transition-delay:.36s;}
   .dot-node{
     width:60px;height:60px;border-radius:50%;
     display:flex;align-items:center;justify-content:center;font-size:26px;
@@ -310,6 +380,11 @@
   .orbit-legend{
     display:flex;flex-direction:column;gap:8px;align-items:flex-start;
     max-width:560px;margin:0 auto;
+  }
+  .demo-h{
+    text-align:center;font-size:clamp(17px,2.4vw,21px);font-weight:800;
+    letter-spacing:-.01em;margin:38px 0 4px;padding-top:30px;
+    border-top:1px solid var(--line);
   }
   .orbit-legend .lg{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--muted);font-weight:600;}
   .orbit-legend .sw{width:14px;height:14px;border-radius:50%;flex:none;}
@@ -341,64 +416,31 @@
   <header>
     <div class="kicker">Cómo funciona Cassper</div>
     <h1>Las ventas perdidas viven <span class="hl">dentro de la conversación</span></h1>
-    <p class="sub">Cassper no busca un WhatsApp suelto: se conecta a tu mesa de ayuda para leer los chats y rescatar la venta que se perdió. Va más allá del carrito abandonado.</p>
+    <p class="sub">Cassper se conecta a tu mesa de ayuda, lee los chats y rescata la venta que se perdió.</p>
   </header>
 
-  <!-- Pre-condición: la mesa de ayuda -->
-  <div class="setup">
-    <span class="lbl">Lo que ya tienes →</span>
-    <span class="chip helpdesk"><span class="e">🎧</span> Mesa de ayuda</span>
-    <span class="eq">conecta</span>
-    <span class="chip"><span class="e">💬</span> WhatsApp</span>
-    <span class="plus">+</span>
-    <span class="chip"><span class="e">🛒</span> Shopify / ecommerce</span>
-    <span class="eq">→</span>
-    <span class="chip" style="border-color:var(--accent);color:var(--accent);"><span class="e">🧠</span> Cassper se monta encima</span>
-  </div>
-
-  <div class="stage">
-    <div class="track" id="track">
-      <div class="rail"><div class="rail-fill" id="railFill"></div></div>
-      <div class="dot" id="dot"></div>
-
-      <div class="step" data-step="0">
-        <div class="node stack">
-          <div class="cap">Mesa de ayuda</div>
-          <div class="row"><span>💬</span><span>🛒</span></div>
-        </div>
-        <div class="badge">01 · Fuente</div>
-        <div class="title">Conversaciones reales</div>
-        <div class="desc">Cassper se integra a tu mesa de ayuda (con WhatsApp + ecommerce) y lee los chats.</div>
-      </div>
-
-      <div class="step" data-step="1">
-        <div class="node"><span class="emoji">🔎</span></div>
-        <div class="badge">02 · Diagnóstico</div>
-        <div class="title">Venta perdida en el chat</div>
-        <div class="desc">Encuentra la intención de compra que no cerró y por qué. Más allá del carrito abandonado.</div>
-      </div>
-
-      <div class="step" data-step="2">
-        <div class="node"><span class="emoji">📝</span></div>
-        <div class="badge">03 · Acción</div>
-        <div class="title">Plantilla de WhatsApp</div>
-        <div class="desc">Arma un mensaje personalizado según el motivo exacto de la caída.</div>
-      </div>
-
-      <div class="step" data-step="3">
-        <div class="node"><span class="emoji">🙋</span></div>
-        <div class="badge">04 · Cliente</div>
-        <div class="title">Cliente final</div>
-        <div class="desc">Recibe el mensaje por la misma mesa de ayuda y vuelve a comprar.</div>
-        <div class="recovered-tag">✓ Conversión recuperada</div>
-      </div>
+  <!-- Conexión + flujo, en una sola tarjeta compacta -->
+  <div class="stage compact">
+    <!-- línea de conexión simple -->
+    <div class="conn">
+      <span class="chip"><span class="e">🎧</span> Mesa de ayuda</span>
+      <span class="dotsep">·</span>
+      <span class="chip"><span class="e">💬</span> WABA</span>
+      <span class="dotsep">·</span>
+      <span class="chip"><span class="e">🛒</span> Ecommerce</span>
+      <span class="conn-arrow">→</span>
+      <span class="chip accent"><span class="e">🧠</span> Cassper se monta encima</span>
     </div>
 
-    <div class="caption" id="caption">Presiona <b>Reproducir</b> para ver el flujo.</div>
-
-    <div class="controls">
-      <button class="btn-play" id="playBtn">▶ Reproducir</button>
-      <button class="btn-reset" id="resetBtn">↺ Reiniciar</button>
+    <!-- paso a paso simple en una fila -->
+    <div class="miniflow">
+      <div class="ms"><span class="ms-ic">💬</span><span class="ms-t">Lee los chats</span></div>
+      <span class="ms-arrow">→</span>
+      <div class="ms"><span class="ms-ic">🔎</span><span class="ms-t">Detecta la venta perdida</span></div>
+      <span class="ms-arrow">→</span>
+      <div class="ms"><span class="ms-ic">📝</span><span class="ms-t">Plantilla de WhatsApp</span></div>
+      <span class="ms-arrow">→</span>
+      <div class="ms ms-win"><span class="ms-ic">✅</span><span class="ms-t">Venta recuperada</span></div>
     </div>
   </div>
 
@@ -406,20 +448,7 @@
   <div class="heat">
     <div class="kicker">Zona de calor · Motivos de pérdida</div>
     <h2>No todas las ventas perdidas son iguales de "calientes"</h2>
-    <p class="sub">Estas categorías no se configuran a mano: <b>la IA de Cassper las descubre leyendo lo que dicen las conversaciones</b>. Mientras más caliente el motivo, mayor probabilidad de reconvertir. El carrito abandonado ya lo trabajan otras apps; Cassper va a buscar todo lo que viene después.</p>
-
-    <div class="ai-pill">🤖 Detectado por IA a partir de las conversaciones</div>
-
-    <div class="ai-demo">
-      <div class="chatbox" id="chatbox"></div>
-      <div class="ai-arrow" id="aiArrow">
-        <span class="ar">→</span>
-        <span id="aiArrowLbl">IA lee</span>
-      </div>
-      <div class="ai-out" id="aiOut">
-        <span class="lead">Cassper infiere</span>
-      </div>
-    </div>
+    <p class="sub">Mientras más caliente el motivo, mayor probabilidad de reconvertir. El carrito abandonado ya lo trabajan otras apps; Cassper va a buscar todo lo que viene después.</p>
 
     <div class="orbit" id="orbit">
       <!-- concentric rings -->
@@ -466,115 +495,38 @@
       <span class="lg"><i class="sw others"></i> 🛒 Carrito abandonado ya lo hacen otras apps</span>
       <span class="lg"><i class="sw cassper"></i> 🧠 Cassper rescata todo lo que orbita más afuera, leyendo la conversación</span>
     </div>
+
+    <!-- ¿Cómo descubre los motivos? Demo de IA -->
+    <h3 class="demo-h">¿Y cómo descubre cada motivo?</h3>
+    <p class="sub">Estas categorías no se configuran a mano: <b>la IA de Cassper las descubre leyendo lo que dicen las conversaciones</b>, y dispara la plantilla justa para recuperar.</p>
+
+    <div class="ai-pill">🤖 Detectado por IA a partir de las conversaciones</div>
+
+    <div class="ai-demo">
+      <div class="chatbox" id="chatbox"></div>
+      <div class="ai-arrow" id="aiArrow">
+        <span class="ar">→</span>
+        <span id="aiArrowLbl">IA lee</span>
+      </div>
+      <div class="ai-out" id="aiOut">
+        <span class="lead">Cassper infiere</span>
+      </div>
+      <div class="ai-arrow" id="aiArrow2">
+        <span class="ar">→</span>
+        <span id="aiArrow2Lbl">envía</span>
+      </div>
+      <div class="hsm-col" id="hsmCol">
+        <span class="lead">Plantilla HSM de WhatsApp</span>
+      </div>
+    </div>
   </div>
 
 <script>
-  const steps = Array.from(document.querySelectorAll('.step'));
-  const dot = document.getElementById('dot');
-  const railFill = document.getElementById('railFill');
-  const caption = document.getElementById('caption');
-  const playBtn = document.getElementById('playBtn');
-  const resetBtn = document.getElementById('resetBtn');
-  const track = document.getElementById('track');
-
-  const captions = [
-    'Tu <b>mesa de ayuda</b> ya tiene WhatsApp y el ecommerce conectados. Cassper se monta encima y lee las conversaciones.',
-    'Dentro del chat, Cassper detecta una <b>venta perdida</b> con intención real… algo que el carrito abandonado nunca vería.',
-    'Genera una <b>plantilla de WhatsApp</b> según el porqué exacto de la caída.',
-    'El cliente responde y vuelve a comprar. <b>✓ Venta recuperada.</b>'
-  ];
-
-  let playing = false;
-  let timers = [];
-
-  function clearAll(){
-    timers.forEach(t=>clearTimeout(t));
-    timers = [];
-    steps.forEach(s=>s.classList.remove('active','done','recovered'));
-    dot.classList.remove('show');
-    railFill.style.width = '0%';
-    railFill.style.transition = 'width .25s linear';
-  }
-
-  function nodeCenter(step){
-    const node = step.querySelector('.node');
-    const tRect = track.getBoundingClientRect();
-    const nRect = node.getBoundingClientRect();
-    return (nRect.left + nRect.width/2) - tRect.left;
-  }
-
-  function moveDotTo(step, dur){
-    const x = nodeCenter(step);
-    dot.style.transition = `left ${dur}ms cubic-bezier(.45,.05,.35,1)`;
-    dot.style.left = x + 'px';
-  }
-
-  function play(){
-    if(playing) return;
-    clearAll();
-    playing = true;
-    playBtn.textContent = '▶ Reproduciendo…';
-    playBtn.disabled = true;
-
-    const startX = nodeCenter(steps[0]);
-    dot.style.transition = 'none';
-    dot.style.left = startX + 'px';
-    void dot.offsetWidth;
-    dot.classList.add('show');
-
-    const stepTime = 1900;
-
-    steps.forEach((step, i)=>{
-      timers.push(setTimeout(()=>{
-        steps.forEach(s=>s.classList.remove('active'));
-        step.classList.add('active');
-        if(i>0) steps[i-1].classList.add('done');
-
-        moveDotTo(step, 720);
-        railFill.style.width = ( (i/(steps.length-1)) * 100 ) + '%';
-        caption.innerHTML = captions[i];
-
-        if(i === steps.length-1){
-          timers.push(setTimeout(()=>{
-            step.classList.add('done','recovered');
-            dot.style.transition = 'opacity .4s ease';
-            dot.classList.remove('show');
-          }, 850));
-          timers.push(setTimeout(()=>{
-            playing = false;
-            playBtn.textContent = '▶ Reproducir';
-            playBtn.disabled = false;
-          }, 1700));
-        }
-      }, i*stepTime));
-    });
-  }
-
-  function reset(){
-    clearAll();
-    playing = false;
-    playBtn.textContent = '▶ Reproducir';
-    playBtn.disabled = false;
-    caption.innerHTML = 'Presiona <b>Reproducir</b> para ver el flujo.';
-  }
-
-  playBtn.addEventListener('click', play);
-  resetBtn.addEventListener('click', reset);
-
-  window.addEventListener('resize', ()=>{
-    const active = document.querySelector('.step.active');
-    if(active && dot.classList.contains('show')){
-      const x = nodeCenter(active);
-      dot.style.transition = 'none';
-      dot.style.left = x + 'px';
-    }
-  });
-
   // ---------- ORBIT positioning ----------
   const orbit = document.getElementById('orbit');
   const planets = Array.from(document.querySelectorAll('.planet'));
   // ring radius as fraction of half-size (matches ring widths /2)
-  const ringR = { r1:0.19, r2:0.30, r3:0.40, r4:0.495 };
+  const ringR = { r1:0.19, r2:0.285, r3:0.375, r4:0.45 };
 
   // base angle (deg) + very slow per-planet angular speed (deg per second)
   const planetState = planets.map(p=>({
@@ -587,17 +539,22 @@
   let spinning = false;
   let lastT = null;
 
+  function orbitSize(){
+    const r = orbit.getBoundingClientRect();
+    return r.width || orbit.clientWidth || orbit.offsetWidth || 0;
+  }
+
   function renderOrbit(){
-    const size = orbit.clientWidth;
+    const size = orbitSize();
+    if(!size) return false;
     const half = size/2;
     planetState.forEach(s=>{
       const r = ringR[s.ring] * size;
       const a = s.ang * Math.PI/180;
-      const x = half + r*Math.cos(a);
-      const y = half + r*Math.sin(a);
-      s.el.style.left = x + 'px';
-      s.el.style.top  = y + 'px';
+      s.el.style.left = (half + r*Math.cos(a)) + 'px';
+      s.el.style.top  = (half + r*Math.sin(a)) + 'px';
     });
+    return true;
   }
 
   function tick(t){
@@ -610,40 +567,44 @@
     requestAnimationFrame(tick);
   }
 
-  function collapsePlanets(){
-    const half = orbit.clientWidth/2;
-    planets.forEach(p=>{ p.style.left = half+'px'; p.style.top = half+'px'; });
+  // Place planets as soon as we have a valid size; retry until we do.
+  function ensurePlaced(){
+    if(renderOrbit()){
+      return true;
+    }
+    return false;
   }
 
-  // start collapsed at center, then fly out + begin slow spin when scrolled into view
-  collapsePlanets();
+  // Keep them on their rings on any size change.
+  const orbitRO = new ResizeObserver(()=> renderOrbit());
+  orbitRO.observe(orbit);
+
+  // Initial placement attempts (covers layout-not-ready cases).
+  function initPlacement(tries){
+    if(ensurePlaced() || tries<=0) return;
+    requestAnimationFrame(()=> initPlacement(tries-1));
+  }
+  initPlacement(30);
+  window.addEventListener('load', ()=> renderOrbit());
+
+  // Reveal (fade/scale in) + start slow spin when scrolled into view.
   const orbitObs = new IntersectionObserver((entries)=>{
     entries.forEach(e=>{
       if(e.isIntersecting){
-        orbit.classList.add('in');
-        // stagger outward to each ring
-        planetState.forEach((s,i)=> setTimeout(()=>{
-          const size = orbit.clientWidth, half=size/2;
-          const r = ringR[s.ring]*size;
-          const a = s.ang*Math.PI/180;
-          s.el.style.left = (half + r*Math.cos(a))+'px';
-          s.el.style.top  = (half + r*Math.sin(a))+'px';
-        }, 200 + i*220));
-        // once they've arrived, switch to continuous slow orbit
+        renderOrbit();
+        orbit.classList.add('in');   // CSS fades planets in
         setTimeout(()=>{
-          // kill the per-property transitions so the rAF loop is smooth
-          planets.forEach(p=> p.style.transition = 'opacity .6s ease');
           spinning = true;
           lastT = null;
           requestAnimationFrame(tick);
-        }, 200 + planetState.length*220 + 950);
+        }, 600);
         orbitObs.disconnect();
       }
     });
-  }, {threshold:.3});
+  }, {threshold:.2});
   orbitObs.observe(orbit);
 
-  window.addEventListener('resize', ()=>{ if(orbit.classList.contains('in')) renderOrbit(); });
+  window.addEventListener('resize', ()=> renderOrbit());
 
 
   // ---------- LOOPING AI CHAT DEMO (autoplay, GIF-style) ----------
@@ -651,6 +612,9 @@
   const aiOut = document.getElementById('aiOut');
   const aiArrow = document.getElementById('aiArrow');
   const aiArrowLbl = document.getElementById('aiArrowLbl');
+  const aiArrow2 = document.getElementById('aiArrow2');
+  const aiArrow2Lbl = document.getElementById('aiArrow2Lbl');
+  const hsmCol = document.getElementById('hsmCol');
 
   const cases = [
     {
@@ -662,7 +626,10 @@
       tags:[
         {cls:'green', t:'📦 Falta de stock + 👻 ghosting'},
         {cls:'',      t:'💰 Venta perdida: $399.990'}
-      ]
+      ],
+      hsm:{ tpl:'recuperacion_stock', biz:'Tienda',
+        msg:'Hola <span class="var">{{1}}</span> 👋 ¡Buenas noticias! El <span class="var">Horno 80L</span> que buscabas ya está disponible. ¿Te lo reservamos?',
+        cta:'🛒 Comprar ahora' }
     },
     {
       chat:[
@@ -673,7 +640,10 @@
       tags:[
         {cls:'green', t:'❓ Duda no resuelta + 🕐 indecisión'},
         {cls:'',      t:'💰 Venta perdida: $329.990'}
-      ]
+      ],
+      hsm:{ tpl:'resuelve_duda', biz:'Tienda',
+        msg:'Hola <span class="var">{{1}}</span> 👋 Tu <span class="var">Lavadora</span> incluye instalación y despacho gratis. ¿Avanzamos con tu compra hoy?',
+        cta:'✅ Sí, quiero comprar' }
     },
     {
       chat:[
@@ -684,7 +654,10 @@
       tags:[
         {cls:'green', t:'⚔️ Compite por precio + 👻 ghosting'},
         {cls:'',      t:'💰 Venta perdida: $629.990'}
-      ]
+      ],
+      hsm:{ tpl:'oferta_match', biz:'Tienda',
+        msg:'Hola <span class="var">{{1}}</span> 👋 Igualamos el precio del <span class="var">Refrigerador Combi</span> + 10% extra de descuento solo por hoy.',
+        cta:'🔥 Ver mi oferta' }
     },
     {
       chat:[
@@ -695,7 +668,10 @@
       tags:[
         {cls:'green', t:'🛒 Checkout no completado + 👻 ghosting'},
         {cls:'',      t:'💰 Venta perdida: $449.990'}
-      ]
+      ],
+      hsm:{ tpl:'completa_compra', biz:'Tienda',
+        msg:'Hola <span class="var">{{1}}</span> 👋 Dejaste lista tu <span class="var">Cocina 4 quemadores</span>. Termina tu compra en 1 clic, te guardamos el precio.',
+        cta:'💳 Pagar ahora' }
     }
   ];
 
@@ -707,6 +683,9 @@
     aiOut.innerHTML = '<span class="lead">Cassper infiere</span>';
     aiArrow.classList.remove('thinking');
     aiArrowLbl.textContent = 'IA lee';
+    aiArrow2.classList.remove('thinking');
+    aiArrow2Lbl.textContent = 'envía';
+    hsmCol.innerHTML = '<span class="lead">Plantilla HSM de WhatsApp</span>';
   }
 
   async function runCase(c){
@@ -747,7 +726,33 @@
       await sleep(420);
     }
 
-    await sleep(2400); // hold so it's readable
+    // Cassper envía la plantilla HSM de WhatsApp
+    aiArrow2.classList.add('thinking');
+    aiArrow2Lbl.textContent = 'enviando…';
+    await sleep(800);
+    aiArrow2.classList.remove('thinking');
+    aiArrow2Lbl.textContent = 'envía';
+
+    const phone = document.createElement('div');
+    phone.className = 'hsm-phone';
+    phone.innerHTML =
+      '<div class="hsm-head"><span class="wa">🟢</span><span class="biz">'+c.hsm.biz+'</span>'+
+      '<span class="tpl">HSM · '+c.hsm.tpl+'</span></div>'+
+      '<div class="hsm-msg">'+c.hsm.msg+'</div>'+
+      '<div class="hsm-cta">'+c.hsm.cta+'</div>';
+    hsmCol.appendChild(phone);
+    void phone.offsetWidth;
+    phone.classList.add('show');
+    await sleep(700);
+
+    const st = document.createElement('div');
+    st.className = 'hsm-status';
+    st.innerHTML = '✓✓ Plantilla enviada al cliente';
+    hsmCol.appendChild(st);
+    void st.offsetWidth;
+    st.classList.add('show');
+
+    await sleep(2600); // hold so it's readable
   }
 
   async function loopDemo(){
